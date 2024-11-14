@@ -1,17 +1,14 @@
-import { useState } from "react";
 import List from "./List";
-import Item from "./Item";
-import { Box, Typography } from "@mui/material";
+import Item from "./components/Item";
+import { Box, Typography, IconButton } from "@mui/material";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AppContext } from "./ThemedApp";
 
 export default function App() {
-  // const { mode } = useContext;
-  // eslint-disable-next-line no-unused-vars
-  const [data, setData] = useState([
-    { id: 1, description: "Learn Express", status: "INPROGRESS" },
-    { id: 2, description: "Learn React", status: "TODO" },
-    { id: 3, description: "AWS Solution Architect", status: "TODO" },
-  ]);
+  const navigate = useNavigate();
+  const { data } = useContext(AppContext);
 
   return (
     <Box sx={{ maxWidth: 600, margin: "20px auto" }}>
@@ -19,7 +16,9 @@ export default function App() {
         <Typography variant="h3" component="h3">
           E-Commerce
         </Typography>
-        <AddCircleIcon color="primary" sx={{fontSize: 30}}/>
+        <IconButton onClick={() => navigate("/addNote")}>
+          <AddCircleIcon color="primary" sx={{fontSize: 30}}/>
+        </IconButton>
       </Box>
       <List>
         {data.map((item) => {
