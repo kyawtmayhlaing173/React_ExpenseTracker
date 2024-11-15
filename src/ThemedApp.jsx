@@ -1,23 +1,42 @@
-import { createContext } from "react";
+import { createContext, useContext } from "react";
 import { useState } from "react";
 
-import App from "./App";
+import Home from "./pages/Home";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AddNote from "./pages/AddNote";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import { QueryClientProvider, QueryClient } from "react-query";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AppContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
+export function useApp() {
+  return useContext(AppContext);
+}
+
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <Home />,
   },
   {
     path: "/addNote",
     element: <AddNote />,
   },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
+  },
 ]);
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const queryClient = new QueryClient();
 
 export default function ThemedApp() {
   const [data, setData] = useState([
@@ -36,7 +55,9 @@ export default function ThemedApp() {
 
   return (
     <AppContext.Provider value={{ data, addItem }}>
-      <RouterProvider router={router}></RouterProvider>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router}></RouterProvider>
+      </QueryClientProvider>
     </AppContext.Provider>
   );
 }
