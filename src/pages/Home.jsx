@@ -73,7 +73,7 @@ export default function Home() {
       </Box>
       <List>
         {data.map((item) => {
-          return <Item key={item.id} content={item.description} />;
+          return <Item expense={item} key=""/>;
         })}
       </List>
     </Box>

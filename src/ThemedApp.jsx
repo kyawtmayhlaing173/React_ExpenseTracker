@@ -48,17 +48,13 @@ export const queryClient = new QueryClient();
 export default function ThemedApp() {
   const [auth, setAuth] = useState(null);
 
-  const [data, setData] = useState([
-    { id: 1, description: "Learn Express", status: "INPROGRESS" },
-    { id: 2, description: "Learn React", status: "TODO" },
-    { id: 3, description: "AWS Solution Architect", status: "TODO" },
-  ]);
+  const [data, setData] = useState([]);
 
-  const addItem = (description, amount, category, notes) => {
-    console.log(`Adding Item ${description} ${amount} ${category} ${notes}`);
+  const addItem = (item) => {
+    console.log(`Adding Item ${item.description} ${item.amount} ${item.category} ${item.notes}`);
     setData([
       ...data,
-      { id: data.length + 1, description: description, status: notes },
+      item,
     ]);
   };
 

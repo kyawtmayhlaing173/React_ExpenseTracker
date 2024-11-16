@@ -8,8 +8,8 @@ export default function AddExpense() {
     const { addItem } = useContext(AppContext);
     const navigate = useNavigate();
 
-    const handleAddItem = (newItem) => {
-        addItem(newItem);
+    const handleAddItem = (description, amount, category, notes) => {
+        addItem({description, amount, category, notes});
         navigate("/");
     }
 
