@@ -4,9 +4,11 @@ import { Button, Box, TextField, Typography, Alert } from "@mui/material";
 import { useRef, useState } from "react";
 import { useMutation } from "react-query";
 import { postLogin } from "../libs/fetcher";
+import { useApp } from "../ThemedApp";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { setAuth } = useApp();
 
   const emailInput = useRef();
   const passwordInput = useRef();
@@ -18,7 +20,7 @@ export default function Login() {
     const password = passwordInput.current.value;
 
     if (!email || !password) {
-      setError("Email and password is required");
+      setError("Email and password are required");
       return false;
     }
 
@@ -30,7 +32,8 @@ export default function Login() {
       console.log(`Cannot create account ${e}`);
       setError(e);
     },
-    onSuccess: async () => {
+    onSuccess: async (result) => {
+      setAuth(result);
       navigate("/");
     },
   });

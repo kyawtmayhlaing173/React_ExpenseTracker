@@ -4,7 +4,7 @@ import { AppContext } from "../ThemedApp";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function AddNote() {
+export default function AddExpense() {
     const { addItem } = useContext(AppContext);
     const navigate = useNavigate();
 
@@ -16,7 +16,7 @@ export default function AddNote() {
     return (
         <Box sx={{ margin: "20px auto", maxWidth: 600 }}>
             <Typography variant="h3" component="h3" sx={{ mb: 4 }}>
-                Add Note
+                Add Expense 💸
             </Typography>
             <Form add={handleAddItem}/>
         </Box>

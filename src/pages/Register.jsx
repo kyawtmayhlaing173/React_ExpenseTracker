@@ -18,7 +18,7 @@ export default function Register() {
     const password = passwordInput.current.value;
 
     if (!email || !password) {
-      setError("Email and password is required");
+      setError("Email and password are required");
       return false;
     }
 

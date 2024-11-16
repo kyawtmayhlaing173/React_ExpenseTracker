@@ -1,12 +1,19 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, useMemo } from "react";
 import { useState } from "react";
 
 import Home from "./pages/Home";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import AddNote from "./pages/AddNote";
+import AddExpense from "./pages/AddExpense";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { QueryClientProvider, QueryClient } from "react-query";
+import {
+  ThemeProvider,
+  createTheme,
+  CssBaseline,
+  GlobalStyles,
+} from "@mui/material";
+import { grey } from "@mui/material/colors";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AppContext = createContext();
@@ -22,8 +29,8 @@ const router = createBrowserRouter([
     element: <Home />,
   },
   {
-    path: "/addNote",
-    element: <AddNote />,
+    path: "/addExpense",
+    element: <AddExpense />,
   },
   {
     path: "/login",
@@ -39,25 +46,55 @@ const router = createBrowserRouter([
 export const queryClient = new QueryClient();
 
 export default function ThemedApp() {
+  const [auth, setAuth] = useState(null);
+
   const [data, setData] = useState([
     { id: 1, description: "Learn Express", status: "INPROGRESS" },
     { id: 2, description: "Learn React", status: "TODO" },
     { id: 3, description: "AWS Solution Architect", status: "TODO" },
   ]);
 
-  const addItem = (newItem) => {
-    console.log(`Adding Item ${newItem}`);
+  const addItem = (description, amount, category, notes) => {
+    console.log(`Adding Item ${description} ${amount} ${category} ${notes}`);
     setData([
       ...data,
-      { id: data.length + 1, description: newItem, status: "TODO" },
+      { id: data.length + 1, description: description, status: notes },
     ]);
   };
 
+  const theme = useMemo(() => {
+    return createTheme({
+      palette: {
+        mode: "dark",
+        background: {
+          main: "#A02334",
+        },
+        primary: {
+          main: "#96CEB4",
+        },
+        secondary: {
+          main: "#FFAD60",
+        },
+        text: {
+          fade: grey[500],
+        },
+      },
+    });
+  }, []);
+
   return (
-    <AppContext.Provider value={{ data, addItem }}>
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router}></RouterProvider>
-      </QueryClientProvider>
-    </AppContext.Provider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <GlobalStyles
+        styles={{
+          body: { backgroundColor: "#A02334" },
+        }}
+      />
+      <AppContext.Provider value={{ data, addItem, auth, setAuth }}>
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router}></RouterProvider>
+        </QueryClientProvider>
+      </AppContext.Provider>
+    </ThemeProvider>
   );
 }
