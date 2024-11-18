@@ -33,12 +33,14 @@ export default function Login() {
       setError(e);
     },
     onSuccess: async (result) => {
+      localStorage.setItem("token", result.token);
       setAuth(result);
       navigate("/");
     },
   });
 
   return (
+    // TODO: Update UI here
     <Box sx={{ maxWidth: 600, margin: "20px auto" }}>
       <Typography variant="h3">Login</Typography>
       {error && (

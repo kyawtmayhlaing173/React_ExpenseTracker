@@ -1,15 +1,25 @@
-import { Box, Typography, Chip } from "@mui/material";
+import { Box, Typography, Chip, ListItem } from "@mui/material";
 
 export default function Item({ expense }) {
-
   return (
-    <li style={{ padding: 10, borderBottom: "1px solid #ddd" }}>
+    <ListItem
+      sx={{
+        padding: 2,
+        border: "1px solid #96CEB4",
+        borderRadius: "10px",
+        mb: 4,
+      }}
+    >
       <Box>
-        <Typography variant="h4">{expense.description}</Typography>
-        <Chip label={expense.category} color="primary" sx={{mb: 2, mt: 1}}/>
-        <Typography>฿{expense.amount}</Typography>
-        <Typography>Notes: {expense.notes}</Typography>
+        <Typography variant="h4">{expense["description"]}</Typography>
+        <Chip
+          label={expense["category"]}
+          color="primary"
+          sx={{ mb: 2, mt: 1 }}
+        />
+        <Typography>฿{expense["amount"]}</Typography>
+        <Typography>Notes: {expense["notes"]}</Typography>
       </Box>
-    </li>
+    </ListItem>
   );
 }

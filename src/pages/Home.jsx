@@ -1,16 +1,29 @@
-import List from "../List";
 import Item from "../components/Item";
-import { Box, Typography, IconButton, Button } from "@mui/material";
+import {
+  Box,
+  Typography,
+  IconButton,
+  Button,
+  CircularProgress,
+  Alert,
+} from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
-import { AppContext } from "../ThemedApp";
+import { useApp } from "../ThemedApp";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
+import { useQuery } from "react-query";
+import { fetchExpenses } from "../libs/fetcher";
 
 export default function Home() {
   const navigate = useNavigate();
-  const { data, auth, setAuth } = useContext(AppContext);
+  const { auth, setAuth } = useApp();
+
+  const token = localStorage.getItem("token");
+  const { data, isLoading, isError, error } = useQuery(
+    ["expenses", token],
+    () => fetchExpenses(token)
+  );
 
   const logout = () => {
     setAuth(null);
@@ -25,6 +38,24 @@ export default function Home() {
     navigate("/addExpense");
   };
 
+  if (isError) {
+    <Box>
+      <Alert severity="warning">{error.message}</Alert>
+    </Box>;
+  }
+
+  if (isLoading) {
+    return (
+      <CircularProgress
+        sx={{
+          color: "secondary.main",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      />
+    );
+  }
   return (
     <Box sx={{ maxWidth: 600, margin: "20px auto" }}>
       <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -38,7 +69,7 @@ export default function Home() {
               gap: 1,
             }}
           >
-            <Typography>{auth.user.email}</Typography>
+            <Typography>{auth.email}</Typography>
             <IconButton onClick={logout}>
               <LogoutIcon />
             </IconButton>
@@ -71,11 +102,24 @@ export default function Home() {
           <Typography>Add Expense</Typography>
         </Button>
       </Box>
-      <List>
-        {data.map((item) => {
-          return <Item expense={item} key=""/>;
-        })}
-      </List>
+
+      {data && data.length > 0 ? (
+        data.map((item) => {
+          return <Item expense={item} key={item.id} />;
+        })
+      ) : (
+        <Typography
+          sx={{
+            fontSize: 30,
+            color: "primary.main",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          Nothing to show
+        </Typography>
+      )}
     </Box>
   );
 }

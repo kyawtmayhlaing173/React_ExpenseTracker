@@ -23,14 +23,12 @@ export default function Form({ add }) {
 
   return (
     <form
-      onSubmit={(e) => {
-        console.log(e);
+      onSubmit={() => {
         const description = descriptionRef.current.value;
         const category = selectedValue;
         const notes = notesRef.current.value;
         const amount = amountRef.current.value;
         add(description, amount, category, notes);
-        e.currentTarget.reset();
       }}
     >
       <Box sx={{ mb: 4, textAlign: "right" }}>

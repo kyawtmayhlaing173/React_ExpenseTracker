@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useContext, useEffect, useMemo } from "react";
 import { useState } from "react";
 
 import Home from "./pages/Home";
@@ -14,6 +14,7 @@ import {
   GlobalStyles,
 } from "@mui/material";
 import { grey } from "@mui/material/colors";
+import { verifyToken } from "./libs/fetcher";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AppContext = createContext();
@@ -23,10 +24,15 @@ export function useApp() {
   return useContext(AppContext);
 }
 
+function RootRoute() {
+  const { auth } = useContext(AppContext);
+  return auth ? <Home /> : <Login />;
+}
+
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home />,
+    element: <RootRoute />,
   },
   {
     path: "/addExpense",
@@ -47,16 +53,20 @@ export const queryClient = new QueryClient();
 
 export default function ThemedApp() {
   const [auth, setAuth] = useState(null);
-
   const [data, setData] = useState([]);
 
   const addItem = (item) => {
-    console.log(`Adding Item ${item.description} ${item.amount} ${item.category} ${item.notes}`);
-    setData([
-      ...data,
-      item,
-    ]);
+    console.log(
+      `Adding Item ${item.description} ${item.amount} ${item.category} ${item.notes}`
+    );
+    setData([...data, item]);
   };
+
+  useEffect(() => {
+    verifyToken().then((user) => {
+      setAuth(user);
+    });
+  }, []);
 
   const theme = useMemo(() => {
     return createTheme({
