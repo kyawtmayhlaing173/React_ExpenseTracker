@@ -1,4 +1,4 @@
-import Item from "../components/Item";
+import Item from "../components/ExpenseItem";
 import {
   Box,
   Typography,
@@ -19,18 +19,16 @@ export default function Home() {
   const navigate = useNavigate();
   const { auth, setAuth } = useApp();
 
-  const token = localStorage.getItem("token");
-  const { data, isLoading, isError, error } = useQuery(
-    ["expenses", token],
-    () => fetchExpenses(token)
+  const { data, isLoading, isError, error } = useQuery(["expenses"], () =>
+    fetchExpenses()
   );
 
   const logout = () => {
     setAuth(null);
+    localStorage.setItem("token", null);
   };
 
   const navigateToLogin = () => {
-    console.log("Login");
     navigate("/login");
   };
 
@@ -46,14 +44,20 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <CircularProgress
+      <Box
         sx={{
-          color: "secondary.main",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          height: "100vh",
         }}
-      />
+      >
+        <CircularProgress
+          sx={{
+            color: "secondary.main",
+          }}
+        />
+      </Box>
     );
   }
   return (
@@ -93,7 +97,7 @@ export default function Home() {
         </Typography>
         <Button
           sx={{
-            backgroundColor: "secondary.main",
+            backgroundColor: "background.main",
             color: "white",
           }}
           onClick={addExpense}

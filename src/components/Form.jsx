@@ -8,14 +8,22 @@ import {
   MenuItem,
 } from "@mui/material";
 import { useRef } from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function Form({ add }) {
+export default function Form({ add, expense }) {
   const descriptionRef = useRef();
   const notesRef = useRef();
   const amountRef = useRef();
-
   const [selectedValue, setSelectedValue] = useState("");
+
+  useEffect(() => {
+    if (expense) {
+      descriptionRef.current.value = expense.description || "";
+      notesRef.current.value = expense.notes || "";
+      amountRef.current.value = expense.amount || "";
+      setSelectedValue(expense.category || "");
+    }
+  }, [expense]);
 
   const handleChange = (event) => {
     setSelectedValue(event.target.value);

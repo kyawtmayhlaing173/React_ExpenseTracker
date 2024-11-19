@@ -29,7 +29,6 @@ export default function Login() {
 
   const create = useMutation(async (data) => postLogin(data), {
     onError: async (e) => {
-      console.log(`Cannot create account ${e}`);
       setError(e);
     },
     onSuccess: async (result) => {
@@ -40,33 +39,51 @@ export default function Login() {
   });
 
   return (
-    // TODO: Update UI here
-    <Box sx={{ maxWidth: 600, margin: "20px auto" }}>
-      <Typography variant="h3">Login</Typography>
-      {error && (
-        <Alert severity="warning" sx={{ mt: 2 }}>
-          {error}
-        </Alert>
-      )}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSubmit();
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "100vh",
+        backgroundColor: "background.default",
+      }}
+    >
+      <Box
+        sx={{
+          width: "100%",
+          maxWidth: 600,
+          margin: "20px auto",
+          backgroundColor: "divider",
+          padding: "24px",
+          borderRadius: "10px",
         }}
       >
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 1, mt: 2 }}>
-          <TextField placeholder="Email" inputRef={emailInput} />
-          <TextField
-            type="password"
-            placeholder="Password"
-            inputRef={passwordInput}
-            fullWidth
-          />
-          <Button type="submit" variant="contained" fullWidth>
-            Login
-          </Button>
-        </Box>
-      </form>
+        <Typography variant="h3">Login</Typography>
+        {error && (
+          <Alert severity="warning" sx={{ mt: 2 }}>
+            {error}
+          </Alert>
+        )}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+        >
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1, mt: 4 }}>
+            <TextField placeholder="Email" inputRef={emailInput} />
+            <TextField
+              type="password"
+              placeholder="Password"
+              inputRef={passwordInput}
+              fullWidth
+            />
+            <Button type="submit" variant="contained" fullWidth sx={{ mt: 3 }}>
+              Login
+            </Button>
+          </Box>
+        </form>
+      </Box>
     </Box>
   );
 }

@@ -36,7 +36,8 @@ export async function postLogin(data) {
   throw errorMessage;
 }
 
-export async function fetchExpenses(token) {
+export async function fetchExpenses() {
+  const token = getToken();
   const res = await fetch(`${api}/expenses`, {
     method: "GET",
     headers: {
@@ -55,14 +56,15 @@ export async function fetchExpenses(token) {
   throw errorMessage;
 }
 
-// TODO: Remove token from parameter
-export async function postExpenses(data, token) {
+export async function postExpenses(data) {
+  const token = getToken();
   const res = await fetch(`${api}/expense`, {
     method: "POST",
     body: JSON.stringify({
       description: data.description,
       amount: Number(data.amount),
       category: data.category,
+      notes: data.notes,
     }),
     headers: {
       "Content-Type": "application/json",
@@ -79,6 +81,44 @@ export async function postExpenses(data, token) {
   throw errorMessage;
 }
 
+export async function updateExpense(expense) {
+  const token = getToken();
+  const res = await fetch(`${api}/expense/${expense.id}`, {
+    method: "PUT",
+    body: JSON.stringify({
+      description: expense.description,
+      amount: Number(expense.amount),
+      category: expense.category,
+      notes: expense.notes,
+    }),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    }
+  });
+  if (res.ok) {
+    return res.json();
+  }
+  const errorResponse = await res.json();
+  const errorMessage = errorResponse["msg"] || "Something went wrong";
+  throw errorMessage; 
+}
+
+export async function deleteExpense(expense) {
+  const token = getToken();
+  const res = await fetch(`${api}/expense/${expense.id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (res.ok) {
+    return res.json();
+  }
+  return false;
+}
+
 export function getToken() {
   return localStorage.getItem("token");
 }
@@ -89,8 +129,8 @@ export async function verifyToken() {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+    },
   });
   if (res.ok) {
     return res.json();

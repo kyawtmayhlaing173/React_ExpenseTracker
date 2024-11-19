@@ -11,7 +11,6 @@ import {
   ThemeProvider,
   createTheme,
   CssBaseline,
-  GlobalStyles,
 } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { verifyToken } from "./libs/fetcher";
@@ -56,9 +55,6 @@ export default function ThemedApp() {
   const [data, setData] = useState([]);
 
   const addItem = (item) => {
-    console.log(
-      `Adding Item ${item.description} ${item.amount} ${item.category} ${item.notes}`
-    );
     setData([...data, item]);
   };
 
@@ -91,11 +87,11 @@ export default function ThemedApp() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <GlobalStyles
+      {/* <GlobalStyles
         styles={{
           body: { backgroundColor: "#A02334" },
         }}
-      />
+      /> */}
       <AppContext.Provider value={{ data, addItem, auth, setAuth }}>
         <QueryClientProvider client={queryClient}>
           <RouterProvider router={router}></RouterProvider>
