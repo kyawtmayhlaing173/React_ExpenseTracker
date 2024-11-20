@@ -1,3 +1,5 @@
+import { convertDate } from "../utils/DateUtils";
+
 const api = "http://localhost:8000";
 
 export async function postUser(data) {
@@ -36,9 +38,21 @@ export async function postLogin(data) {
   throw errorMessage;
 }
 
-export async function fetchExpenses() {
+export async function fetchExpenses(filter, startDate, endDate) {
   const token = getToken();
-  const res = await fetch(`${api}/expenses`, {
+  const baseURL = `${api}/expenses`;
+  var url = ``;
+  if (filter == "custom" && startDate != "" && endDate != "") {
+    const start = convertDate(startDate);
+    const end = convertDate(endDate);
+    url = `${baseURL}?filter=${filter}&startDate=${start}&endDate=${end}`;
+  } else if (filter != "") {
+    url = `${baseURL}?filter=${filter}`;
+  } else {
+    url = baseURL;
+  }
+
+  const res = await fetch(url, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -94,14 +108,14 @@ export async function updateExpense(expense) {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
-    }
+    },
   });
   if (res.ok) {
     return res.json();
   }
   const errorResponse = await res.json();
   const errorMessage = errorResponse["msg"] || "Something went wrong";
-  throw errorMessage; 
+  throw errorMessage;
 }
 
 export async function deleteExpense(expense) {

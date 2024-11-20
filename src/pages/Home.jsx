@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Item from "../components/ExpenseItem";
 import {
   Box,
@@ -6,6 +7,14 @@ import {
   Button,
   CircularProgress,
   Alert,
+  Select,
+  MenuItem,
+  FormControl,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField
 } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { useNavigate } from "react-router-dom";
@@ -18,14 +27,27 @@ import { fetchExpenses } from "../libs/fetcher";
 export default function Home() {
   const navigate = useNavigate();
   const { auth, setAuth } = useApp();
+  const [selectedValue, setSelectedValue] = useState("all");
+  const [openCustomDialog, setOpenCustomDialog] = useState(false);
+  const [customStartDate, setCustomStartDate] = useState('');
+  const [customEndDate, setCustomEndDate] = useState('');
 
-  const { data, isLoading, isError, error } = useQuery(["expenses"], () =>
-    fetchExpenses()
+  const { data, isLoading, isError, error, refetch } = useQuery(
+    ["expenses", selectedValue, customStartDate, customEndDate],
+    () => {
+      if (selectedValue === 'custom') {
+        return fetchExpenses(selectedValue, customStartDate, customEndDate);
+      }
+      return fetchExpenses(selectedValue, customStartDate, customEndDate);
+    },
+    {
+      enabled: (selectedValue !== 'custom') || (customStartDate != "" && customEndDate != ""),
+    }
   );
 
   const logout = () => {
     setAuth(null);
-    localStorage.setItem("token", null);
+    localStorage.removeItem("token");
   };
 
   const navigateToLogin = () => {
@@ -36,10 +58,28 @@ export default function Home() {
     navigate("/addExpense");
   };
 
+  const handleChange = (event) => {
+    const value = event.target.value;
+    setSelectedValue(value);
+
+    if (value === 'custom') {
+      setOpenCustomDialog(true);
+    }
+  };
+
+  const handleCustomDateSubmit = () => {
+    if (customStartDate && customEndDate) {
+      refetch();
+      setOpenCustomDialog(false);
+    }
+  };
+
   if (isError) {
-    <Box>
-      <Alert severity="warning">{error.message}</Alert>
-    </Box>;
+    return (
+      <Box>
+        <Alert severity="error">{error.message}</Alert>
+      </Box>
+    );
   }
 
   if (isLoading) {
@@ -60,8 +100,10 @@ export default function Home() {
       </Box>
     );
   }
+
   return (
     <Box sx={{ maxWidth: 600, margin: "20px auto" }}>
+      {/* User Authentication Section */}
       <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
         {auth ? (
           <Box
@@ -84,6 +126,8 @@ export default function Home() {
           </IconButton>
         )}
       </Box>
+
+      {/* Header Section */}
       <Box
         sx={{
           paddingBottom: 4,
@@ -96,21 +140,45 @@ export default function Home() {
           Expense Tracker
         </Typography>
         <Button
-          sx={{
-            backgroundColor: "background.main",
-            color: "white",
-          }}
+          variant="contained"
           onClick={addExpense}
+          startIcon={<AddCircleIcon />}
         >
-          <AddCircleIcon />
-          <Typography>Add Expense</Typography>
+          Add Expense
         </Button>
       </Box>
 
+      {/* Filter Section */}
+      <Box sx={{ display: "flex", flexDirection: "row", mb: 4, justifyContent: "flex-end" }}>
+        <FormControl
+          size="medium"
+          sx={{
+            width: "200px",
+            height: "50px",
+          }}
+        >
+          <Select
+            value={selectedValue}
+            onChange={handleChange}
+            defaultValue="all"
+            sx={{
+              textAlign: "left",
+            }}
+          >
+            <MenuItem value="all">All</MenuItem>
+            <MenuItem value="past-week">Past Week</MenuItem>
+            <MenuItem value="last-month">Last Month</MenuItem>
+            <MenuItem value="last-three-month">Last 3 months</MenuItem>
+            <MenuItem value="custom">Custom</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+
+      {/* Expense List Section */}
       {data && data.length > 0 ? (
-        data.map((item) => {
-          return <Item expense={item} key={item.id} />;
-        })
+        data.map((item) => (
+          <Item expense={item} key={item.id} />
+        ))
       ) : (
         <Typography
           sx={{
@@ -119,11 +187,56 @@ export default function Home() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            mt: 4
           }}
         >
           Nothing to show
         </Typography>
       )}
+
+      {/* Custom Date Range Dialog */}
+      <Dialog 
+        open={openCustomDialog} 
+        onClose={() => setOpenCustomDialog(false)}
+        fullWidth
+        maxWidth="xs"
+      >
+        <DialogTitle>Select Custom Date Range</DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+            <TextField
+              label="Start Date"
+              type="date"
+              value={customStartDate}
+              onChange={(e) => setCustomStartDate(e.target.value)}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              fullWidth
+            />
+            <TextField
+              label="End Date"
+              type="date"
+              value={customEndDate}
+              onChange={(e) => setCustomEndDate(e.target.value)}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              fullWidth
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenCustomDialog(false)}>Cancel</Button>
+          <Button 
+            onClick={handleCustomDateSubmit}
+            variant="contained"
+            disabled={!customStartDate || !customEndDate}
+          >
+            Apply
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
