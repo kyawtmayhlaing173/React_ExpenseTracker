@@ -31,17 +31,21 @@ export default function Home() {
   const [openCustomDialog, setOpenCustomDialog] = useState(false);
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
+  const [shouldFetchData, setShouldFetchData] = useState(false);
 
   const { data, isLoading, isError, error, refetch } = useQuery(
     ["expenses", selectedValue, customStartDate, customEndDate],
     () => {
       if (selectedValue === 'custom') {
+        setShouldFetchData(false);
         return fetchExpenses(selectedValue, customStartDate, customEndDate);
       }
-      return fetchExpenses(selectedValue, customStartDate, customEndDate);
+      setCustomStartDate('');
+      setCustomEndDate('');
+      return fetchExpenses(selectedValue, null, null);
     },
     {
-      enabled: (selectedValue !== 'custom') || (customStartDate != "" && customEndDate != ""),
+      enabled: (selectedValue !== 'custom' || shouldFetchData),
     }
   );
 
@@ -69,6 +73,7 @@ export default function Home() {
 
   const handleCustomDateSubmit = () => {
     if (customStartDate && customEndDate) {
+      setShouldFetchData(true);
       refetch();
       setOpenCustomDialog(false);
     }
